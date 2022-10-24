@@ -1,0 +1,110 @@
+import { CircularProgress } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { useGlobalContext } from "../context/ServicesContext";
+import { userSelect } from "../redux/userSlice";
+
+export const DataServices = () => {
+    const { data, dataLoading, setDataLoading, dataResponse } = useGlobalContext();
+  const inputStyle =
+    "py-2 px-3 bg-black/50 w-full focus:text-black border-none focus:border focus:border-none focus:border-gray-200 focus:bg-transparent block placeholder:text-white";
+
+    const { airtimeSelection } = useSelector((state) => state.user)
+    const { serviceID } = airtimeSelection
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+   const [servicesData, setServicesData] = useState([])
+   const [isLoading, setIsLoading] = useState(true)
+   const [airtimeAmount, setAirtimeAmount] = useState('')
+   const [variationCode, setVariationCode] = useState('')
+
+  const [inputData, setInputData] = useState({
+    phone: "",
+    email: "",
+    plan: "",
+  });
+
+  const onChangeInput = (e) => {
+    setInputData((prevState) => ({
+      ...prevState,
+      [e.target.id]: e.target.value,
+    }));
+  };
+
+  const variation_code = variationCode
+
+  const onSubmit = (e) => {
+    e.preventDefault();
+    dispatch(userSelect({ ...inputData, airtimeAmount, variation_code }));
+    navigate("/confirm");
+  };
+
+
+
+const { phone, email, plan } = inputData;
+console.log(plan)
+
+useEffect(() => {
+
+    const selectedService = dataResponse?.find(service => service.name === plan);
+    setAirtimeAmount(selectedService?.variation_amount)
+    setVariationCode(selectedService?.variation_code)
+    
+    },[plan, dataResponse])
+
+  return (
+    <form action="" className="space-y-2 mt-4" onSubmit={onSubmit}>
+        {dataLoading ? ( <div className='flex justify-center items-center'><CircularProgress /></div>) : (
+      <select
+        className={inputStyle}
+        id="plan"
+        name="plan"
+        value={plan}
+        onChange={onChangeInput}
+        required
+      >
+        <option value='' selected disabled>Select a bundle plan</option>
+        {dataResponse?.map((services, index) => (
+        <option value={services.name} key={index}>{services.name}</option>    
+        ))}
+      </select>
+        )}
+       
+      <input
+        placeholder="Enter phone Number"
+        id="phone"
+        type="tel"
+        maxLength="11"
+        minLength="9"
+        className={inputStyle}
+        value={phone}
+        onChange={onChangeInput}
+        required
+      />
+      <input
+        placeholder="Email address"
+        id="email"
+        type="email"
+        className={inputStyle}
+        value={email}
+        onChange={onChangeInput}
+        required
+      />
+      <input
+        type="number"
+        className={inputStyle}
+        value={airtimeAmount}
+        onChange={onChangeInput}
+        disabled
+        required
+      />
+      <button className="w-full border-none bg-red-600 py-2 text-white font-bold text-xl rounded-sm">
+        continue
+      </button>
+    </form>
+  );
+};
+
+export default DataServices;
