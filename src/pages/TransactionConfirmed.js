@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 
 const TransactionConfirmed = () => {
   const { userDetails, airtimeSelection } = useSelector((state) => state.user)
-  const { request_id } = useSelector((state) => state.user.reference_id)
+  
   const { phone, email, airtimeAmount } = userDetails
   const { serviceID, airtimeProviderImg, name } = airtimeSelection
   const { responseDetails } = useSelector((state) => state.response)
